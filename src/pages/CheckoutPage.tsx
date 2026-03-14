@@ -76,17 +76,14 @@ export default function CheckoutPage() {
       const data = await initializePayment(selectedAddress)
 
       // Open Paystack popup
-      const handler = (window as any).PaystackPop.setup({
+      const handler = new (window as any).PaystackPop({
         key: data.publicKey,
         email: data.email,
         amount: Math.round(data.amount * 100),
         currency: 'ZAR',
         ref: data.reference,
-        onClose: () => {
-          setPlacing(false)
-          setError('Payment cancelled')
-        },
-        callback: async (response: any) => {
+        onClose: () => { setPlacing(false); setError('Payment cancelled') },
+        onSuccess: async (response: any) => {
           try {
             const result = await verifyPayment(response.reference)
             await fetchCart()
@@ -97,10 +94,7 @@ export default function CheckoutPage() {
           }
         },
       })
-
-      handler.openIframe()
-
-      handler.openIframe()
+      handler.open()
     } catch (err: any) {
       console.error('Payment error:', err)
       setError(err.response?.data?.message || 'Failed to initialize payment')
