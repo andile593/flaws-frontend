@@ -46,7 +46,7 @@ export default function Navbar() {
         position: 'sticky',
         top: 0, left: 0, right: 0,
         zIndex: 1000,
-        height: '100vw',
+        height: '64px',
         background: scrolled || menuOpen ? 'rgba(10,10,10,0.98)' : 'transparent',
         borderBottom: scrolled || menuOpen ? '1px solid #1a1a1a' : '1px solid transparent',
         backdropFilter: scrolled ? 'blur(12px)' : 'none',

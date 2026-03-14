@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useCartStore } from '../store/useCartStore'
 import { useBreakpoint } from '../hooks/useBreakpoint'
 import { getAddresses, addAddress } from '../api/address.api'
-import { createOrder } from '../api/orders.api'
+import { initializePayment, verifyPayment } from '../api/payment.api'
 
 interface Address {
   id: string
@@ -64,21 +64,47 @@ export default function CheckoutPage() {
     }
   }
 
-  const handlePlaceOrder = async () => {
-    if (!selectedAddress) return setError('Please select a delivery address')
-    if (items.length === 0) return setError('Your cart is empty')
-    setPlacing(true)
-    setError('')
-    try {
-      const order = await createOrder(selectedAddress)
-      await fetchCart()
-      navigate(`/orders/${order.id}`)
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to place order')
-    } finally {
-      setPlacing(false)
-    }
+const handlePlaceOrder = async () => {
+  if (!selectedAddress) return setError('Please select a delivery address')
+  if (items.length === 0) return setError('Your cart is empty')
+
+  setPlacing(true)
+  setError('')
+
+  try {
+    // Initialize payment with backend
+    const data = await initializePayment(selectedAddress)
+
+    // Open Paystack popup
+    const handler = (window as any).PaystackPop.setup({
+      key: data.publicKey,
+      email: data.email,
+      amount: Math.round(data.amount * 100),
+      currency: 'ZAR',
+      ref: data.reference,
+      onClose: () => {
+        setPlacing(false)
+        setError('Payment cancelled')
+      },
+      callback: async (response: any) => {
+        try {
+          // Verify and get order ID
+          const result = await verifyPayment(response.reference)
+          await fetchCart() // clear cart state
+          navigate(`/orders/${result.orderId}`)
+        } catch {
+          setError('Payment successful but order creation failed. Contact support.')
+          setPlacing(false)
+        }
+      },
+    })
+
+    handler.openIframe()
+  } catch (err: any) {
+    setError(err.response?.data?.message || 'Failed to initialize payment')
+    setPlacing(false)
   }
+}
 
   const shipping = Number(total) >= 1000 ? 0 : 100
   const orderTotal = Number(total) + shipping
@@ -287,12 +313,9 @@ export default function CheckoutPage() {
                 transition: 'all 0.3s',
               }}
             >
-              {placing ? 'Placing Order...' : 'Place Order'}
+              {placing ? 'Initializing...' : 'Pay Now'}
             </button>
 
-            <p style={{ fontSize: '0.65rem', color: '#555', textAlign: 'center', marginTop: '1rem', lineHeight: 1.6 }}>
-              Payment collected on delivery or via Paystack once integrated.
-            </p>
           </div>
         </div>
       </div>
