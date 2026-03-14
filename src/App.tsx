@@ -17,12 +17,19 @@ import OrdersPage from './pages/OrdersPage'
 import AccountPage from './pages/AccountPage'
 import CollectionsPage from './pages/CollectionsPage'
 import CollectionDetailPage from './pages/CollectionDetailPage'
+import { useContentStore } from './store/useContentStore'
+
 
 export default function App() {
   const { fetchMe, token } = useAuthStore()
+  const { fetch: fetchContent } = useContentStore()
 
   useEffect(() => {
     if (token) fetchMe()
+  }, [])
+  useEffect(() => {
+    if (token) fetchMe()
+    fetchContent()
   }, [])
 
   return (

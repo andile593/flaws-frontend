@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import axios from '../api/axios'
 import { useBreakpoint } from '../hooks/useBreakpoint'
+import { useContentStore } from '../store/useContentStore'
 
 interface Product {
   id: string
@@ -12,58 +13,32 @@ interface Product {
   variants: { price: number; salePrice: number | null }[]
 }
 
-interface SiteContent {
-  banner_text?: string
-  hero_headline?: string
-  hero_subtext?: string
-  featured_product_ids?: string
-  featured_collection_ids?: string
-}
-
 export default function HomePage() {
   const { isMobile } = useBreakpoint()
+  const { content } = useContentStore()
   const [featured, setFeatured] = useState<Product[]>([])
-  const [content, setContent] = useState<SiteContent>({})
 
   useEffect(() => {
-    // Fetch products and site content in parallel
-    Promise.all([
-      axios.get('/products'),
-      axios.get('/content'),
-    ]).then(([productsRes, contentRes]) => {
-      const siteContent: SiteContent = contentRes.data
-      setContent(siteContent)
+    axios.get('/products').then((res) => {
+      const allProducts: Product[] = res.data
 
-      const allProducts: Product[] = productsRes.data
+      const featuredIds = content?.featured_product_ids
+        ? content.featured_product_ids.split(',').filter(Boolean)
+        : []
 
-      // If admin has selected specific featured products, use that order
-      if (siteContent.featured_product_ids) {
-        const ids = siteContent.featured_product_ids
-          .split(',')
-          .filter(Boolean)
-
-        if (ids.length > 0) {
-          // Preserve the order admin selected them in
-          const ordered = ids
-            .map(id => allProducts.find(p => p.id === id))
-            .filter(Boolean) as Product[]
-          setFeatured(ordered)
-          return
-        }
+      if (featuredIds.length > 0) {
+        const ordered = featuredIds
+          .map((id: string) => allProducts.find(p => p.id === id))
+          .filter(Boolean) as Product[]
+        setFeatured(ordered.length > 0 ? ordered : allProducts.filter(p => p.isFeatured))
+      } else {
+        setFeatured(allProducts.filter(p => p.isFeatured))
       }
-
-      // Fallback: use isFeatured flag from product
-      setFeatured(allProducts.filter(p => p.isFeatured))
     })
-  }, [])
+  }, [content])
 
-  // Parse featured collection IDs for the collections banner
-  const featuredCollectionIds = content.featured_collection_ids
-    ? content.featured_collection_ids.split(',').filter(Boolean)
-    : []
-
-  const heroHeadline = content.hero_headline || 'FLAWS'
-  const heroSubtext = content.hero_subtext || 'New Season — 2026'
+  const heroHeadline = content?.hero_headline || 'FLAWS'
+  const heroSubtext = content?.hero_subtext || 'New Season — 2026'
 
   return (
     <div style={{ background: '#0a0a0a', minHeight: '100vh' }}>
@@ -126,7 +101,7 @@ export default function HomePage() {
 
       {/* Featured Products */}
       {featured.length > 0 && (
-        <section style={{ padding: '6rem 2rem', maxWidth: '1400px', margin: '0 auto' }}>
+        <section style={{ padding: isMobile ? '3rem 1rem' : '6rem 2rem', maxWidth: '1400px', margin: '0 auto' }}>
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -134,40 +109,17 @@ export default function HomePage() {
             marginBottom: '3rem',
           }}>
             <div>
-              <p style={{
-                fontSize: '0.65rem',
-                letterSpacing: '0.25em',
-                textTransform: 'uppercase',
-                color: '#888',
-                marginBottom: '0.5rem',
-              }}>
+              <p style={{ fontSize: '0.65rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: '#888', marginBottom: '0.5rem' }}>
                 Selected Pieces
               </p>
-              <h2 style={{
-                fontSize: '1.5rem',
-                fontWeight: 600,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-              }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                 Featured
               </h2>
             </div>
-            <Link
-              to="/products"
-              style={{
-                fontSize: '0.65rem',
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-                color: '#888',
-                textDecoration: 'none',
-                borderBottom: '1px solid #888',
-                paddingBottom: '2px',
-              }}
-            >
+            <Link to="/products" style={{ fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#888', textDecoration: 'none', borderBottom: '1px solid #888', paddingBottom: '2px' }}>
               View All
             </Link>
           </div>
-
           <div style={{
             display: 'grid',
             gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fill, minmax(300px, 1fr))',
@@ -182,10 +134,7 @@ export default function HomePage() {
       )}
 
       {/* Collections Banner */}
-      <section style={{
-        padding: isMobile ? '3rem 1rem' : '6rem 2rem',
-        borderTop: '1px solid #1a1a1a',
-      }}>
+      <section style={{ padding: isMobile ? '3rem 1rem' : '6rem 2rem', borderTop: '1px solid #1a1a1a' }}>
         <div style={{
           maxWidth: '1400px',
           margin: '0 auto',
@@ -194,31 +143,13 @@ export default function HomePage() {
           gap: '1px',
           background: '#1a1a1a',
         }}>
-          <CollectionBanner
-            title="Men's"
-            subtitle="Essentials"
-            href={
-              featuredCollectionIds.length > 0
-                ? `/collections?gender=MEN`
-                : '/collections?gender=MEN'
-            }
-            isMobile={isMobile}
-          />
-          <CollectionBanner
-            title="Women's"
-            subtitle="Essentials"
-            href="/collections?gender=WOMEN"
-            isMobile={isMobile}
-          />
+          <CollectionBanner title="Men's" subtitle="Essentials" href="/collections?gender=MEN" isMobile={isMobile} />
+          <CollectionBanner title="Women's" subtitle="Essentials" href="/collections?gender=WOMEN" isMobile={isMobile} />
         </div>
       </section>
 
       {/* Brand Statement */}
-      <section style={{
-        padding: isMobile ? '4rem 1.5rem' : '8rem 2rem',
-        borderTop: '1px solid #1a1a1a',
-        textAlign: 'center',
-      }}>
+      <section style={{ padding: isMobile ? '4rem 1.5rem' : '8rem 2rem', borderTop: '1px solid #1a1a1a', textAlign: 'center' }}>
         <p style={{
           fontSize: isMobile ? '1.3rem' : 'clamp(1.5rem, 4vw, 3rem)',
           fontWeight: 300,
@@ -230,22 +161,8 @@ export default function HomePage() {
         }}>
           Designed for those who find beauty in imperfection.
         </p>
-        <div style={{
-          width: '40px',
-          height: '1px',
-          background: '#888',
-          margin: '2rem auto 0',
-        }} />
+        <div style={{ width: '40px', height: '1px', background: '#888', margin: '2rem auto 0' }} />
       </section>
-
-      <style>{`
-        @keyframes scrollLine {
-          0% { transform: scaleY(0); transform-origin: top; }
-          50% { transform: scaleY(1); transform-origin: top; }
-          51% { transform: scaleY(1); transform-origin: bottom; }
-          100% { transform: scaleY(0); transform-origin: bottom; }
-        }
-      `}</style>
     </div>
   )
 }
@@ -256,81 +173,33 @@ function ProductCard({ product }: { product: Product }) {
   const price = product.variants[0]?.salePrice ?? product.variants[0]?.price
 
   return (
-    <Link
-      to={`/products/${product.slug}`}
-      style={{ textDecoration: 'none', color: 'inherit' }}
-    >
+    <Link to={`/products/${product.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
       <div
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        style={{
-          background: '#0a0a0a',
-          cursor: 'pointer',
-          overflow: 'hidden',
-        }}
+        style={{ background: '#0a0a0a', cursor: 'pointer', overflow: 'hidden' }}
       >
-        <div style={{
-          aspectRatio: '3/4',
-          overflow: 'hidden',
-          background: '#111',
-        }}>
+        <div style={{ aspectRatio: '3/4', overflow: 'hidden', background: '#111' }}>
           {primaryImage ? (
-            <img
-              src={primaryImage}
-              alt={product.name}
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                transition: 'transform 0.6s ease',
-                transform: hovered ? 'scale(1.05)' : 'scale(1)',
-              }}
-            />
+            <img src={primaryImage} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s ease', transform: hovered ? 'scale(1.05)' : 'scale(1)' }} />
           ) : (
-            <div style={{
-              width: '100%',
-              height: '100%',
-              background: '#111',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#333',
-              fontSize: '0.7rem',
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-            }}>
+            <div style={{ width: '100%', height: '100%', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#333', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
               No Image
             </div>
           )}
         </div>
-
         <div style={{ padding: '1rem' }}>
-          <p style={{
-            fontSize: '0.75rem',
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            color: '#ffffff',
-            marginBottom: '0.25rem',
-          }}>
+          <p style={{ fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#ffffff', marginBottom: '0.25rem' }}>
             {product.name}
           </p>
-          {price && (
-            <p style={{ fontSize: '0.75rem', color: '#888' }}>
-              R{Number(price).toFixed(2)}
-            </p>
-          )}
+          {price && <p style={{ fontSize: '0.75rem', color: '#888' }}>R{Number(price).toFixed(2)}</p>}
         </div>
       </div>
     </Link>
   )
 }
 
-function CollectionBanner({ title, subtitle, href, isMobile }: {
-  title: string
-  subtitle: string
-  href: string
-  isMobile: boolean
-}) {
+function CollectionBanner({ title, subtitle, href, isMobile }: { title: string; subtitle: string; href: string; isMobile: boolean }) {
   const [hovered, setHovered] = useState(false)
 
   return (
@@ -349,31 +218,13 @@ function CollectionBanner({ title, subtitle, href, isMobile }: {
           cursor: 'pointer',
         }}
       >
-        <p style={{
-          fontSize: '0.65rem',
-          letterSpacing: '0.25em',
-          textTransform: 'uppercase',
-          color: '#888',
-          marginBottom: '0.5rem',
-        }}>
+        <p style={{ fontSize: '0.65rem', letterSpacing: '0.25em', textTransform: 'uppercase', color: '#888', marginBottom: '0.5rem' }}>
           {subtitle}
         </p>
-        <h3 style={{
-          fontSize: isMobile ? '2rem' : '2.5rem',
-          fontWeight: 700,
-          letterSpacing: '0.1em',
-          textTransform: 'uppercase',
-          color: '#ffffff',
-        }}>
+        <h3 style={{ fontSize: isMobile ? '2rem' : '2.5rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#ffffff' }}>
           {title}
         </h3>
-        <p style={{
-          fontSize: '0.65rem',
-          letterSpacing: '0.2em',
-          textTransform: 'uppercase',
-          color: '#888',
-          marginTop: '1.5rem',
-        }}>
+        <p style={{ fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#888', marginTop: '1.5rem' }}>
           Shop Now →
         </p>
       </div>

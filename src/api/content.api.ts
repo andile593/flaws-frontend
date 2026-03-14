@@ -1,4 +1,12 @@
 import api from './axios'
 
-export const getSiteContent = () =>
+export interface SiteContent {
+  banner_text: string
+  hero_headline: string
+  hero_subtext: string
+  featured_product_ids: string
+  featured_collection_ids: string
+}
+
+export const getSiteContent = (): Promise<SiteContent> =>
   api.get('/content').then(r => r.data)

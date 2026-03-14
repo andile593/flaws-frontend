@@ -1,4 +1,10 @@
+import { useContentStore } from '../store/useContentStore'
+
 export default function AnnouncementBar() {
+  const { content } = useContentStore()
+
+  const text = content?.banner_text || 'Free shipping on orders over R1000 — South Africa wide'
+
   return (
     <div style={{
       width: '100%',
@@ -11,7 +17,7 @@ export default function AnnouncementBar() {
       textTransform: 'uppercase',
       fontWeight: 500,
     }}>
-      Free shipping on orders over R1000 — South Africa wide
+      {text}
     </div>
   )
 }
