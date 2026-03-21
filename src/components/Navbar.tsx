@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/useAuthStore'
 import { useGuestCartStore } from '../store/useGuestCartStore'
 import { useBreakpoint } from '../hooks/useBreakpoint'
 import { useCartStore } from '../store/useCartStore'
+import SearchModal from './SearchModal'
 
 export default function Navbar() {
   const { user } = useAuthStore()
@@ -12,12 +13,7 @@ export default function Navbar() {
   const { isMobile } = useBreakpoint()
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-
-  useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', handler)
-    return () => window.removeEventListener('scroll', handler)
-  }, [])
+  const [searchOpen, setSearchOpen] = useState(false)
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20)
@@ -31,9 +27,7 @@ export default function Navbar() {
     } else {
       document.body.style.overflow = ''
     }
-    return () => {
-      document.body.style.overflow = ''
-    }
+    return () => { document.body.style.overflow = '' }
   }, [menuOpen])
 
   useEffect(() => {
@@ -50,7 +44,7 @@ export default function Navbar() {
   return (
     <>
       <nav style={{
-        position: 'sticky',
+        position: 'fixed',
         top: 0, left: 0, right: 0,
         zIndex: 1000,
         height: '64px',
@@ -63,7 +57,7 @@ export default function Navbar() {
         padding: '0 2rem',
       }}>
 
-        {/* Left — nav links (desktop) or hamburger (mobile) */}
+        {/* Left */}
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '2rem' }}>
           {isMobile ? (
             <button
@@ -82,15 +76,7 @@ export default function Navbar() {
             </button>
           ) : (
             navLinks.map(({ label, to }) => (
-              <Link key={to} to={to} style={{
-                fontSize: '0.65rem',
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-                color: '#ffffff',
-                textDecoration: 'none',
-              }}>
-                {label}
-              </Link>
+              <Link key={to} to={to} style={linkStyle}>{label}</Link>
             ))
           )}
         </div>
@@ -110,23 +96,43 @@ export default function Navbar() {
           FLAWS
         </Link>
 
-        {/* Right — account + cart */}
+        {/* Right */}
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '1.5rem' }}>
           {!isMobile && (
             <Link to={user ? '/account' : '/login'} style={linkStyle}>
               {user ? (user.name?.split(' ')[0] || 'Account') : 'Login'}
             </Link>
           )}
+          <button
+            onClick={() => setSearchOpen(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#ffffff',
+              cursor: 'pointer',
+              padding: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              fontSize: '1.1rem',
+              lineHeight: 1,
+            }}
+            aria-label="Search"
+          >
+            ⌕
+          </button>
           <Link to="/cart" style={linkStyle}>
             Cart{cartCount > 0 ? ` (${cartCount})` : ''}
           </Link>
         </div>
       </nav>
 
+      {/* Search Modal — outside nav so it's not clipped */}
+      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
+
       {/* Mobile Menu Overlay */}
       {isMobile && menuOpen && (
         <div style={{
-          position: 'sticky',
+          position: 'fixed',
           top: '64px', left: 0, right: 0, bottom: 0,
           background: '#0a0a0a',
           zIndex: 999,
@@ -134,8 +140,9 @@ export default function Navbar() {
           flexDirection: 'column',
           padding: '3rem 2rem',
           borderTop: '1px solid #1a1a1a',
+          overflowY: 'auto',
         }}>
-          {[...navLinks, { label: user ? 'Account' : 'Login', to: user ? '/account' : '/login' }].map(({ label, to }) => (
+          {navLinks.map(({ label, to }) => (
             <Link
               key={to}
               to={to}
@@ -154,6 +161,45 @@ export default function Navbar() {
               {label}
             </Link>
           ))}
+
+          {/* Search in mobile menu */}
+          <button
+            onClick={() => { setMenuOpen(false); setSearchOpen(true) }}
+            style={{
+              background: 'none',
+              border: 'none',
+              borderBottom: '1px solid #1a1a1a',
+              color: '#ffffff',
+              cursor: 'pointer',
+              fontSize: '1.5rem',
+              fontWeight: 700,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              padding: '1.25rem 0',
+              textAlign: 'left',
+              width: '100%',
+            }}
+          >
+            Search
+          </button>
+
+          {/* Account / Login */}
+          <Link
+            to={user ? '/account' : '/login'}
+            onClick={() => setMenuOpen(false)}
+            style={{
+              fontSize: '1.5rem',
+              fontWeight: 700,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: '#ffffff',
+              textDecoration: 'none',
+              padding: '1.25rem 0',
+              borderBottom: '1px solid #1a1a1a',
+            }}
+          >
+            {user ? (user.name?.split(' ')[0] || 'Account') : 'Login'}
+          </Link>
         </div>
       )}
     </>

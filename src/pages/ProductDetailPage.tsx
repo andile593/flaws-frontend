@@ -4,6 +4,7 @@ import { getProductBySlug } from '../api/products.api'
 import { useBreakpoint } from '../hooks/useBreakpoint'
 import api from '../api/axios'
 import { useGuestCartStore } from '../store/useGuestCartStore'
+import SizeGuideModal from '../components/SizeGuideModal'
 
 interface Variant {
   id: string
@@ -39,6 +40,7 @@ export default function ProductDetailPage() {
   const [adding, setAdding] = useState(false)
   const [added, setAdded] = useState(false)
   const [error, setError] = useState('')
+  const [sizeGuideOpen, setSizeGuideOpen] = useState(false)
 
   useEffect(() => {
     if (!slug) return
@@ -256,9 +258,27 @@ export default function ProductDetailPage() {
 
           {/* Size */}
           <div style={{ marginBottom: '2rem' }}>
-            <p style={{ fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#888', marginBottom: '1rem' }}>
-              Size
-            </p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <p style={{ fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#888' }}>
+                Size
+              </p>
+              <button
+                onClick={() => setSizeGuideOpen(true)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#555',
+                  cursor: 'pointer',
+                  fontSize: '0.65rem',
+                  letterSpacing: '0.15em',
+                  textTransform: 'uppercase',
+                  textDecoration: 'underline',
+                  padding: 0,
+                }}
+              >
+                Size Guide
+              </button>
+            </div>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               {sizesForColor.map((variant) => (
                 <button
@@ -351,6 +371,11 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </div>
+      <SizeGuideModal
+        open={sizeGuideOpen}
+        onClose={() => setSizeGuideOpen(false)}
+        gender={product.gender}
+      />
     </div>
   )
 }
