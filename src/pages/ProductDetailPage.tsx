@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { getProductBySlug } from '../api/products.api'
 import { useBreakpoint } from '../hooks/useBreakpoint'
 import api from '../api/axios'
 import { useGuestCartStore } from '../store/useGuestCartStore'
-import { useAuthStore } from '../store/useAuthStore'
 
 interface Variant {
   id: string
@@ -31,7 +30,6 @@ interface Product {
 export default function ProductDetailPage() {
   const { slug } = useParams()
   const { addItem: addToGuestCart } = useGuestCartStore()
-  const { user } = useAuthStore()
   const { isMobile } = useBreakpoint()
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
@@ -56,7 +54,6 @@ export default function ProductDetailPage() {
   const selectedColor = selectedVariant?.color
   const sizesForColor = product?.variants.filter((v) => v.color === selectedColor) || []
 
-
   const handleAddToCart = async () => {
     if (!selectedVariant) return setError('Please select a size')
 
@@ -64,15 +61,13 @@ export default function ProductDetailPage() {
     setError('')
 
     try {
-      if (user) {
-        // Logged in — add to server cart
+      if (localStorage.getItem('token')) {
         await api.post('/cart', {
           productId: product!.id,
           variantId: selectedVariant.id,
           quantity,
         })
       } else {
-        // Guest — add to local cart
         addToGuestCart({
           productId: product!.id,
           variantId: selectedVariant.id,

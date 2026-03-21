@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useCartStore } from '../store/useCartStore'
 import { useGuestCartStore } from '../store/useGuestCartStore'
 import { useAuthStore } from '../store/useAuthStore'
