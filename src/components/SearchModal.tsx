@@ -85,6 +85,20 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
 
   return (
     <>
+      <style>{`
+        .search-modal-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+          gap: 1px;
+          background: #1a1a1a;
+        }
+        @media (max-width: 480px) {
+          .search-modal-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+      `}</style>
+
       {/* Backdrop */}
       <div
         onClick={onClose}
@@ -103,11 +117,13 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
         top: 0,
         left: 0,
         right: 0,
+        width: '100%',
+        boxSizing: 'border-box',
         zIndex: 2001,
         background: '#0a0a0a',
         borderBottom: '1px solid #1a1a1a',
-        padding: '1.5rem 2rem',
-        maxHeight: '80vh',
+        padding: 'clamp(1rem, 4vw, 1.5rem) clamp(1rem, 4vw, 2rem)',
+        maxHeight: '85vh',
         overflowY: 'auto',
       }}>
 
@@ -115,12 +131,12 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '1rem',
+          gap: '0.75rem',
           borderBottom: '1px solid #1a1a1a',
           paddingBottom: '1.25rem',
           marginBottom: '1.5rem',
         }}>
-          <SearchIcon size={20} color="#555" />
+          <SearchIcon size={18} color="#555" />
           <input
             ref={inputRef}
             type="text"
@@ -129,11 +145,12 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
             placeholder="Search products..."
             style={{
               flex: 1,
+              minWidth: 0, // prevents overflow in flex container
               background: 'none',
               border: 'none',
               outline: 'none',
               color: '#ffffff',
-              fontSize: '1.1rem',
+              fontSize: '1rem',
               letterSpacing: '0.05em',
               fontFamily: 'inherit',
             }}
@@ -146,10 +163,11 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
                 border: 'none',
                 color: '#555',
                 cursor: 'pointer',
-                fontSize: '0.7rem',
+                fontSize: '0.65rem',
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
-                padding: '4px 8px',
+                padding: '4px 6px',
+                flexShrink: 0,
               }}
             >
               Clear
@@ -165,8 +183,9 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
               fontSize: '0.65rem',
               letterSpacing: '0.15em',
               textTransform: 'uppercase',
-              padding: '6px 12px',
+              padding: '6px 10px',
               transition: 'all 0.2s',
+              flexShrink: 0,
             }}
             onMouseEnter={e => {
               e.currentTarget.style.borderColor = '#fff'
@@ -206,12 +225,7 @@ export default function SearchModal({ open, onClose }: SearchModalProps) {
             <p style={{ fontSize: '0.6rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#555', marginBottom: '1.25rem' }}>
               {results.length} result{results.length !== 1 ? 's' : ''} for "{query}"
             </p>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
-              gap: '1px',
-              background: '#1a1a1a',
-            }}>
+            <div className="search-modal-grid">
               {results.map(product => {
                 const image = product.images.find(i => i.isPrimary)?.url || product.images[0]?.url
                 const price = product.variants[0]?.salePrice ?? product.variants[0]?.price
