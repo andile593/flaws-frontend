@@ -9,7 +9,6 @@ export default function CartPage() {
   const { user } = useAuthStore()
   const { items: serverItems, total, loading, fetchCart, updateItem, removeItem } = useCartStore()
   const { items: guestItems, updateItem: updateGuest, removeItem: removeGuest } = useGuestCartStore()
-  const navigate = useNavigate()
   const { isMobile } = useBreakpoint()
 
   const isGuest = !user

@@ -30,7 +30,6 @@ interface Product {
 
 export default function ProductDetailPage() {
   const { slug } = useParams()
-  const navigate = useNavigate()
   const { addItem: addToGuestCart } = useGuestCartStore()
   const { user } = useAuthStore()
   const { isMobile } = useBreakpoint()
