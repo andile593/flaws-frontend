@@ -21,6 +21,7 @@ import ReturnsPolicyPage from './pages/ReturnsPolicyPage'
 import ContactPage from './pages/ContactPage'
 import { useContentStore } from './store/useContentStore'
 import { useGuestCartStore } from './store/useGuestCartStore'
+import PaymentSuccessPage from './pages/PaymentSuccessPage'
 
 export default function App() {
   const { fetchMe, token } = useAuthStore()
@@ -57,6 +58,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/payment/success" element={<PaymentSuccessPage />} />
           <Route path="/orders" element={<OrdersPage />} />
           <Route path="/orders/:id" element={<OrderDetailPage />} />
           <Route path="/account" element={<AccountPage />} />

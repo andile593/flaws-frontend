@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useCartStore } from '../store/useCartStore'
 import { useBreakpoint } from '../hooks/useBreakpoint'
 import { getAddresses, addAddress } from '../api/address.api'
-import { initializePayment, verifyPayment } from '../api/payment.api'
+import { initializePayment } from '../api/payment.api'
 
 interface Address {
   id: string
@@ -25,6 +25,8 @@ export default function CheckoutPage() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [placing, setPlacing] = useState(false)
   const [error, setError] = useState('')
+  const [searchParams] = useSearchParams()
+
 
   const [form, setForm] = useState({
     fullName: '',
@@ -36,6 +38,9 @@ export default function CheckoutPage() {
   })
 
   useEffect(() => {
+    if (searchParams.get('cancelled') === 'true') {
+      setError('Payment was cancelled. You can try again.')
+    }
     const token = localStorage.getItem('token')
     if (!token) {
       navigate('/login')
@@ -74,25 +79,22 @@ export default function CheckoutPage() {
     try {
       const data = await initializePayment(selectedAddress)
 
-      // Open Paystack popup
-      const handler = new (window as any).PaystackPop()
-      handler.resumeTransaction(data.accessCode, {
-        onSuccess: async (response: any) => {
-          try {
-            const result = await verifyPayment(response.reference)
-            await fetchCart()
-            navigate(`/orders/${result.orderId}`)
-          } catch {
-            setError('Payment successful but order creation failed. Contact support.')
-            setPlacing(false)
-          }
-        },
-        onCancel: () => {
-          setPlacing(false)
-          setError('Payment cancelled')
-        },
+      // Build a hidden form and submit to PayFast
+      const form = document.createElement('form')
+      form.method = 'POST'
+      form.action = data.payFastUrl
+
+      Object.entries(data.paymentData).forEach(([key, value]) => {
+        const input = document.createElement('input')
+        input.type = 'hidden'
+        input.name = key
+        input.value = value as string
+        form.appendChild(input)
       })
-      handler.open()
+
+      document.body.appendChild(form)
+      form.submit()
+      // Page navigates away — no need to setPlacing(false)
     } catch (err: any) {
       console.error('Payment error:', err)
       setError(err.response?.data?.message || 'Failed to initialize payment')
