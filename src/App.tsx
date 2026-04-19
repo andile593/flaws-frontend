@@ -24,13 +24,9 @@ import { useGuestCartStore } from './store/useGuestCartStore'
 import PaymentSuccessPage from './pages/PaymentSuccessPage'
 import WaitlistPage from './pages/WaitlistPage'
 
-// Set to true to show only the waitlist page.
-// Set to false when ready to launch the full site.
-const WAITLIST_MODE = true
-
 export default function App() {
   const { fetchMe, token } = useAuthStore()
-  const { fetch: fetchContent } = useContentStore()
+  const { fetch: fetchContent, content, loading } = useContentStore()
   const { load: loadGuestCart } = useGuestCartStore()
 
   useEffect(() => {
@@ -39,7 +35,11 @@ export default function App() {
     if (token) fetchMe()
   }, [])
 
-  if (WAITLIST_MODE) {
+  if (loading) return null
+
+  const waitlistMode = content?.waitlist_mode === 'true'
+
+  if (waitlistMode) {
     return (
       <BrowserRouter>
         <Routes>

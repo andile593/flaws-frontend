@@ -6,7 +6,9 @@ export interface SiteContent {
   hero_subtext: string
   featured_product_ids: string
   featured_collection_ids: string
+  waitlist_mode: string  
 }
+ 
 
 export const getSiteContent = (): Promise<SiteContent> =>
   api.get('/content').then(r => r.data)
