@@ -104,7 +104,7 @@ export default function WaitlistPage() {
                 src={flawsLogo}
                 alt="FLAWS"
                 style={{
-                  width: '160px',
+                  width: '460px',
                   height: 'auto',
                   display: 'block',
                   margin: '0 auto',
@@ -289,7 +289,7 @@ function SuccessState({ name }: { name: string }) {
           src={flawsLogo}
           alt="FLAWS"
           style={{
-            width: '160px',
+            width: '460px',
             height: 'auto',
             display: 'block',
             margin: '0 auto',
