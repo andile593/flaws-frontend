@@ -98,37 +98,18 @@ export default function WaitlistPage() {
           <SuccessState name={form.name} />
         ) : (
           <>
-            {/* FLAWS Logo Image */}
+            {/* FLAWS Logo */}
             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
               <img
                 src={flawsLogo}
                 alt="FLAWS"
                 style={{
-                  width: '420px', height: 'auto',
+                  width: '160px',
+                  height: 'auto',
                   display: 'block',
                   margin: '0 auto',
                 }}
-                onError={e => {
-                  // Fallback to text logo if image not found
-                  const target = e.target as HTMLImageElement
-                  target.style.display = 'none'
-                  const fallback = document.getElementById('logo-fallback')
-                  if (fallback) fallback.style.display = 'block'
-                }}
               />
-              <h1
-                id="logo-fallback"
-                className="seasons-font"
-                style={{
-                  display: 'none',
-                  margin: 0,
-                  fontSize: '3.5rem',
-                  color: '#8B0000',
-                  letterSpacing: '0.05em',
-                }}
-              >
-                Flaws
-              </h1>
             </div>
 
             {/* Welcome headline */}
@@ -219,13 +200,13 @@ export default function WaitlistPage() {
               }}
               onMouseEnter={e => {
                 if (status !== 'loading') {
-                  (e.target as HTMLButtonElement).style.background = '#8B0000'
-                    ; (e.target as HTMLButtonElement).style.color = '#fff'
+                  (e.target as HTMLButtonElement).style.background = '#8B0000';
+                  (e.target as HTMLButtonElement).style.color = '#fff'
                 }
               }}
               onMouseLeave={e => {
-                ; (e.target as HTMLButtonElement).style.background = 'transparent'
-                  ; (e.target as HTMLButtonElement).style.color = '#8B0000'
+                (e.target as HTMLButtonElement).style.background = 'transparent';
+                (e.target as HTMLButtonElement).style.color = '#8B0000'
               }}
             >
               {status === 'loading' ? 'Joining...' : 'Join The Family'}
@@ -308,33 +289,13 @@ function SuccessState({ name }: { name: string }) {
           src={flawsLogo}
           alt="FLAWS"
           style={{
-            width: '420px', height: 'auto',
+            width: '160px',
+            height: 'auto',
             display: 'block',
             margin: '0 auto',
           }}
-          onError={e => {
-            // Fallback to text logo if image not found
-            const target = e.target as HTMLImageElement
-            target.style.display = 'none'
-            const fallback = document.getElementById('logo-fallback')
-            if (fallback) fallback.style.display = 'block'
-          }}
         />
-        <h1
-          id="logo-fallback"
-          className="seasons-font"
-          style={{
-            display: 'none',
-            margin: 0,
-            fontSize: '3.5rem',
-            color: '#8B0000',
-            letterSpacing: '0.05em',
-          }}
-        >
-          Flaws
-        </h1>
       </div>
-
 
       <div style={{
         borderTop: '1px solid #1a1a1a',
@@ -349,7 +310,7 @@ function SuccessState({ name }: { name: string }) {
           textTransform: 'uppercase',
           color: '#555',
         }}>
-          You're in
+          {"You're in"}
         </p>
         <h2 style={{
           margin: '0 0 1rem',
@@ -367,7 +328,7 @@ function SuccessState({ name }: { name: string }) {
           color: '#555',
           lineHeight: 1.9,
         }}>
-          You'll hear from us before anyone else.
+          {"You'll hear from us before anyone else."}
         </p>
       </div>
 
@@ -377,7 +338,7 @@ function SuccessState({ name }: { name: string }) {
         letterSpacing: '0.15em',
         textTransform: 'uppercase',
       }}>
-        © 2026 FLAWS — South Africa
+        &copy; 2026 FLAWS &mdash; South Africa
       </p>
     </div>
   )
