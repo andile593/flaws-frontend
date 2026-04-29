@@ -103,7 +103,11 @@ export default function WaitlistPage() {
               <img
                 src={flawsLogo}
                 alt="FLAWS"
-                style={{ width: '420px', height: 'auto', margin: 'auto 0' }}
+                style={{
+                  width: '420px', height: 'auto',
+                  display: 'block',
+                  margin: '0 auto',
+                }}
                 onError={e => {
                   // Fallback to text logo if image not found
                   const target = e.target as HTMLImageElement
@@ -299,14 +303,38 @@ export default function WaitlistPage() {
 function SuccessState({ name }: { name: string }) {
   return (
     <div style={{ textAlign: 'center', animation: 'fadeIn 0.6s ease' }}>
-      <h1 className="seasons-font" style={{
-        margin: '0 0 2rem',
-        fontSize: '3.5rem',
-        color: '#8B0000',
-        letterSpacing: '0.05em',
-      }}>
-        Flaws
-      </h1>
+      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <img
+          src={flawsLogo}
+          alt="FLAWS"
+          style={{
+            width: '420px', height: 'auto',
+            display: 'block',
+            margin: '0 auto',
+          }}
+          onError={e => {
+            // Fallback to text logo if image not found
+            const target = e.target as HTMLImageElement
+            target.style.display = 'none'
+            const fallback = document.getElementById('logo-fallback')
+            if (fallback) fallback.style.display = 'block'
+          }}
+        />
+        <h1
+          id="logo-fallback"
+          className="seasons-font"
+          style={{
+            display: 'none',
+            margin: 0,
+            fontSize: '3.5rem',
+            color: '#8B0000',
+            letterSpacing: '0.05em',
+          }}
+        >
+          Flaws
+        </h1>
+      </div>
+
 
       <div style={{
         borderTop: '1px solid #1a1a1a',
