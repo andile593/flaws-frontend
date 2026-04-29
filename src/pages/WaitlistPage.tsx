@@ -100,7 +100,7 @@ export default function WaitlistPage() {
             {/* FLAWS Logo Image */}
             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
               <img
-                src="/flaws-logo.png"
+                src="/assets/flaws-logo.png"
                 alt="FLAWS"
                 style={{ width: '160px', height: 'auto' }}
                 onError={e => {
@@ -131,7 +131,7 @@ export default function WaitlistPage() {
               <h2 className="seasons-font" style={{
                 margin: '0 0 1rem',
                 fontSize: '1.75rem',
-                color: '#8B0000',
+                color: '#ffffff',
                 lineHeight: 1.3,
                 letterSpacing: '0.02em',
               }}>
@@ -203,7 +203,7 @@ export default function WaitlistPage() {
                 width: '100%',
                 padding: '1.25rem',
                 background: 'transparent',
-                color: status === 'loading' ? '#555' : '#8B0000',
+                color: status === 'loading' ? '#ffffff' : '#8B0000',
                 border: '1px solid #8B0000',
                 fontSize: '1rem',
                 letterSpacing: '0.05em',
