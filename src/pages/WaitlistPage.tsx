@@ -5,7 +5,7 @@ import flawsLogo from '../assets/flaws-logo.png'
 const API = import.meta.env.VITE_API_URL || 'https://flaws-backend-production.up.railway.app'
 
 export default function WaitlistPage() {
-  const [form, setForm] = useState({ name: '', email: '', city: '' })
+  const [form, setForm] = useState({ name: '', email: '', city: ''})
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [mounted, setMounted] = useState(false)
@@ -220,7 +220,7 @@ export default function WaitlistPage() {
               marginTop: '2.5rem',
             }}>
               <a
-                href="https://instagram.com/flaws"
+                href="https://instagram.com/flawswrldwide"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
@@ -236,7 +236,7 @@ export default function WaitlistPage() {
               </a>
 
               <a
-                href="https://tiktok.com/@flaws"
+                href="https://tiktok.com/@flawswrldwide"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="TikTok"
@@ -250,7 +250,7 @@ export default function WaitlistPage() {
               </a>
 
               <a
-                href="https://x.com/flaws"
+                href="https://x.com/@flawswrldwide"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="X"
