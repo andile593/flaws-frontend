@@ -141,7 +141,7 @@ export default function WaitlistPage() {
                 <p style={labelStyle}>Full name</p>
                 <input
                   type="text"
-                  placeholder="Your name"
+                  placeholder="Name"
                   value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })}
                   style={inputStyle}
@@ -153,7 +153,7 @@ export default function WaitlistPage() {
                 <p style={labelStyle}>Email Address</p>
                 <input
                   type="email"
-                  placeholder="your@email.com"
+                  placeholder="Email"
                   value={form.email}
                   onChange={e => setForm({ ...form, email: e.target.value })}
                   style={inputStyle}
@@ -162,10 +162,10 @@ export default function WaitlistPage() {
                 />
               </div>
               <div>
-                <p style={labelStyle}>Your city</p>
+                <p style={labelStyle}>City</p>
                 <input
                   type="text"
-                  placeholder="Johannesburg"
+                  placeholder="City"
                   value={form.city}
                   onChange={e => setForm({ ...form, city: e.target.value })}
                   style={inputStyle}
