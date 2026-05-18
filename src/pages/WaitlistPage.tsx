@@ -359,7 +359,7 @@ const inputStyle: React.CSSProperties = {
   border: '1px solid #222',
   borderBottom: '1px solid #444',
   color: '#ffffff',
-  fontSize: '0.9rem',
+  fontSize: '0.7rem',
   outline: 'none',
   boxSizing: 'border-box',
   transition: 'border-color 0.2s',
